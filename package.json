@@ -1,0 +1,5 @@
+{
+  "name": "agentset-cloudflare",
+  "private": true,
+  "packageManager": "pnpm@9.15.4"
+}

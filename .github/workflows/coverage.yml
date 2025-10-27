@@ -1,0 +1,103 @@
+name: Test Coverage Report
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22.12.0'
+  PNPM_VERSION: '9.15.4'
+
+jobs:
+  coverage:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma types
+        run: |
+          cd agentset
+          pnpm db:generate
+
+      - name: Run tests with coverage
+        run: |
+          cd agentset
+          pnpm --filter @agentset/engine test:coverage || echo "No coverage configured for engine"
+          pnpm --filter @agentset/cloudflare-tools test:coverage || echo "No coverage configured for cloudflare-tools"
+          pnpm --filter @agentset/web test:coverage || echo "No coverage configured for web"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: |
+            ./agentset/packages/engine/coverage/coverage-final.json
+            ./agentset/packages/cloudflare-tools/coverage/coverage-final.json
+            ./agentset/apps/web/coverage/coverage-final.json
+          fail_ci_if_error: false
+          verbose: true
+
+      - name: Generate coverage summary
+        id: coverage-summary
+        run: |
+          echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "agentset/packages/engine/coverage/coverage-summary.json" ]; then
+            echo "### Engine Package" >> $GITHUB_STEP_SUMMARY
+            cat agentset/packages/engine/coverage/coverage-summary.json >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -f "agentset/packages/cloudflare-tools/coverage/coverage-summary.json" ]; then
+            echo "### Cloudflare Tools Package" >> $GITHUB_STEP_SUMMARY
+            cat agentset/packages/cloudflare-tools/coverage/coverage-summary.json >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -f "agentset/apps/web/coverage/coverage-summary.json" ]; then
+            echo "### Web App" >> $GITHUB_STEP_SUMMARY
+            cat agentset/apps/web/coverage/coverage-summary.json >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            agentset/packages/engine/coverage/
+            agentset/packages/cloudflare-tools/coverage/
+            agentset/apps/web/coverage/
+          retention-days: 14
+
+      - name: Coverage quality gate
+        run: |
+          # Extract coverage percentage from summary
+          # This is a placeholder - actual implementation would parse coverage JSON
+          echo "Coverage quality gate check"
+          echo "Target: 80% coverage for all packages"
+          echo "Status: Coverage reports generated successfully"

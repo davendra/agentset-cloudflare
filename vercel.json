@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "cd agentset && pnpm build --filter=web",
-  "installCommand": "cd agentset && pnpm install --frozen-lockfile",
+  "installCommand": "cd agentset && pnpm install",
   "outputDirectory": "agentset/apps/web/.next"
 }

@@ -1,6 +1,3 @@
-# Cloned repositories (not part of this workspace)
-agentset/
-
 # Environment variables
 .env
 .env.local
@@ -35,3 +32,4 @@ yarn-debug.log*
 # .claude/
 # .claude-collective/
 # .taskmaster/
+.vercel

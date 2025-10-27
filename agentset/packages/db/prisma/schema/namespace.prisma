@@ -1,0 +1,105 @@
+enum NamespaceStatus {
+  ACTIVE
+  DELETING
+}
+
+model Namespace {
+  id   String @id @default(cuid())
+  name String
+  slug String
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  /// [NamespaceEmbeddingConfig]
+  embeddingConfig Json?
+
+  /// [NamespaceVectorStoreConfig]
+  vectorStoreConfig Json?
+
+  /// [NamespaceFileStoreConfig]
+  fileStoreConfig Json?
+
+  connections Connection[]
+  ingestJobs  IngestJob[]
+  documents   Document[]
+
+  totalIngestJobs      Int   @default(0) // Total number of ingest jobs in the namespace
+  totalDocuments       Int   @default(0) // Total number of documents in the namespace
+  totalPages           Float @default(0.0)
+  totalPlaygroundUsage Int   @default(0) // Total number of playground requests in the namespace
+
+  keywordEnabled Boolean @default(false) // whether keyword + hybrid search is enabled
+
+  // Cloudflare integration fields
+  ragProvider   String? // RAG provider: "cloudflare", "default", etc.
+  cfModelRoute  String? // Cloudflare AI Gateway model route: "final-answer", "fast-lane", "cheap"
+  cfSafetyLevel String? // Cloudflare safety level: "off", "standard", "strict"
+  cfCacheMode   String? // Cache mode: "public", "private"
+  cfBudgetLimit Float? // Optional budget limit for Cloudflare usage
+  /// [CloudflareSettings]
+  cfSettings    Json? // Additional Cloudflare-specific settings
+
+  hosting           Hosting?
+  cloudflareMetrics CloudflareMetric[]
+
+  status NamespaceStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, slug]) // A namespace must have a unique slug within an organization
+  @@index([status])
+  @@index([organizationId, status]) // For filtering active namespaces
+  @@map("namespace")
+}
+
+model Hosting {
+  id          String    @id @default(cuid())
+  namespaceId String    @unique
+  namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+
+  title  String?
+  slug   String? @unique
+  logo   String?
+  domain Domain?
+
+  // chat settings
+  systemPrompt         String?  @db.Text
+  exampleQuestions     String[] @default([]) @db.Text
+  citationMetadataPath String? // Path to use for citation metadata (e.g. "title" or "foo.bar")
+  welcomeMessage       String?
+
+  // search settings
+  searchEnabled        Boolean  @default(true)
+  exampleSearchQueries String[] @default([]) @db.Text
+
+  // model configuration
+  /// [HostingRerankConfig]
+  rerankConfig Json?
+  /// [HostingLLMConfig]
+  llmConfig    Json?
+
+  protected           Boolean  @default(true) // Whether the namespace is protected from public access
+  allowedEmails       String[] @default([]) // relevant when protected is true
+  allowedEmailDomains String[] @default([]) // relevant when protected is true
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Domain {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  verified Boolean @default(false)
+
+  lastChecked DateTime @default(now())
+
+  hosting   Hosting @relation(fields: [hostingId], references: [id], onDelete: Cascade)
+  hostingId String  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index(lastChecked(sort: Asc))
+}

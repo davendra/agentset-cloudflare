@@ -1,0 +1,46 @@
+model CloudflareMetric {
+  id          String    @id @default(cuid())
+  namespaceId String
+  namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+
+  // Timestamp for metrics (hourly/daily aggregation)
+  timestamp DateTime
+
+  // Query metrics
+  queryCount   Int    @default(0) // Number of queries in this period
+  avgLatencyMs Float? // Average latency in milliseconds
+  p95LatencyMs Float? // 95th percentile latency
+  p99LatencyMs Float? // 99th percentile latency
+
+  // Cache metrics
+  cacheHits   Int @default(0) // Number of cache hits
+  cacheMisses Int @default(0) // Number of cache misses
+
+  // Cost and token metrics
+  totalCost        Float? // Total cost in USD
+  totalTokens      Int? // Total tokens used
+  promptTokens     Int? // Prompt tokens
+  completionTokens Int? // Completion tokens
+
+  // Model usage breakdown (JSON for flexibility)
+  /// [ModelUsageBreakdown]
+  modelUsage Json? // { "gpt-4": 100, "claude-3": 50, etc. }
+
+  // Error metrics
+  errorCount    Int @default(0) // Number of errors
+  rateLimitHits Int @default(0) // Number of rate limit hits
+
+  // Source tracking
+  workspaceId String? // Optional workspace identifier
+  tenantId    String? // Optional tenant identifier
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([namespaceId, timestamp, workspaceId, tenantId])
+  @@index([namespaceId, timestamp])
+  @@index([timestamp])
+  @@index([workspaceId])
+  @@index([tenantId])
+  @@map("cloudflare_metric")
+}

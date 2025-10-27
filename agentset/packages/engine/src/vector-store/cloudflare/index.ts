@@ -4,8 +4,9 @@ import type {
   VectorStoreQueryResponse,
   VectorStoreUpsertOptions,
 } from "../common/vector-store";
-import { CloudflareSearchTool } from "@agentset/cloudflare-tools";
-import type { SearchSource } from "@agentset/cloudflare-tools";
+// TODO: Implement @agentset/cloudflare-tools package
+// import { CloudflareSearchTool } from "@agentset/cloudflare-tools";
+// import type { SearchSource } from "@agentset/cloudflare-tools";
 import { TextNode, MetadataMode } from "@llamaindex/core/schema";
 import { CloudflareFilterTranslator, type CloudflareVectorFilter } from "./filter";
 

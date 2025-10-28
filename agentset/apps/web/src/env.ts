@@ -51,9 +51,9 @@ export const env = createEnv({
 
     TRIGGER_SECRET_KEY: z.string(),
 
-    VERCEL_PROJECT_ID: z.string(),
-    VERCEL_TEAM_ID: z.string(),
-    VERCEL_API_TOKEN: z.string(),
+    VERCEL_PROJECT_ID: z.string().optional(),
+    VERCEL_TEAM_ID: z.string().optional(),
+    VERCEL_API_TOKEN: z.string().optional(),
   },
   client: {},
   runtimeEnv: {

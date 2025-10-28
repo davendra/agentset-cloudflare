@@ -69,15 +69,25 @@ export const getNamespaceVectorStore = async (
     case "CLOUDFLARE": {
       const { CloudflareVectorStore } = await import("./cloudflare/index");
 
+      let endpoint: string;
+      let apiKey: string | undefined;
+
+      if (config.provider === "MANAGED_CLOUDFLARE") {
+        if (!env.DEFAULT_CLOUDFLARE_ENDPOINT) {
+          throw new Error(
+            "MANAGED_CLOUDFLARE provider requires DEFAULT_CLOUDFLARE_ENDPOINT environment variable to be set"
+          );
+        }
+        endpoint = env.DEFAULT_CLOUDFLARE_ENDPOINT;
+        apiKey = env.DEFAULT_CLOUDFLARE_API_KEY;
+      } else {
+        endpoint = config.endpoint;
+        apiKey = config.apiKey;
+      }
+
       return new CloudflareVectorStore({
-        endpoint:
-          config.provider === "MANAGED_CLOUDFLARE"
-            ? env.DEFAULT_CLOUDFLARE_ENDPOINT!
-            : config.endpoint,
-        apiKey:
-          config.provider === "MANAGED_CLOUDFLARE"
-            ? env.DEFAULT_CLOUDFLARE_API_KEY
-            : config.apiKey,
+        endpoint,
+        apiKey,
         workspaceId: config.provider === "CLOUDFLARE" ? config.workspaceId : undefined,
         ...commonConfig,
       }) as VectorStore;

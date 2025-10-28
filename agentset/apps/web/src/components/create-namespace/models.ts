@@ -1,7 +1,6 @@
 import z from "zod/v4";
 
 import { AnthropicIcon } from "@agentset/ui/icons/anthropic";
-import { MicrosoftAzureIcon } from "@agentset/ui/icons/azure";
 import { GoogleIcon } from "@agentset/ui/icons/google";
 import { OpenAIIcon } from "@agentset/ui/icons/openai";
 import { PineconeIcon } from "@agentset/ui/icons/pinecone";
@@ -9,7 +8,7 @@ import { QdrantIcon } from "@agentset/ui/icons/qdrant";
 import { TurbopufferIcon } from "@agentset/ui/icons/turbopuffer";
 import { UpstashIcon } from "@agentset/ui/icons/upstash";
 import {
-  AzureEmbeddingConfigSchema,
+  CloudflareEmbeddingConfigSchema,
   createVectorStoreSchema,
   EmbeddingConfigSchema,
   GoogleEmbeddingConfigSchema,
@@ -25,9 +24,9 @@ export const embeddingModels: {
   icon: React.ComponentType;
 }[] = [
   {
-    value: AzureEmbeddingConfigSchema.shape.provider.value,
-    models: AzureEmbeddingConfigSchema.shape.model.options,
-    icon: MicrosoftAzureIcon,
+    value: CloudflareEmbeddingConfigSchema.shape.provider.value,
+    models: [CloudflareEmbeddingConfigSchema.shape.model.value],
+    icon: OpenAIIcon, // TODO: Add Cloudflare icon
   },
   {
     value: OpenAIEmbeddingConfigSchema.shape.provider.value,

@@ -6,15 +6,21 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "../generated/client";
 
 const createPrismaClient = () => {
-  const connectionString = process.env.DATABASE_URL ?? "";
+  const connectionString = process.env.DATABASE_URL;
 
-  // For local PostgreSQL or Prisma Accelerate, use standard Prisma client without Neon adapter
-  // Prisma Accelerate (prisma://) doesn't support driver adapters
+  // Skip Neon adapter for:
+  // 1. No DATABASE_URL (build time / missing env var)
+  // 2. Prisma Accelerate URLs (prisma:// or prisma+)
+  // 3. Local PostgreSQL (@localhost or @127.0.0.1)
+  // 4. No WebSocket (Node.js without polyfill)
+  // Prisma Accelerate doesn't support driver adapters
   if (
+    !connectionString ||
     typeof WebSocket === "undefined" ||
     connectionString.includes("@localhost") ||
     connectionString.includes("@127.0.0.1") ||
-    connectionString.startsWith("prisma://")
+    connectionString.startsWith("prisma://") ||
+    connectionString.startsWith("prisma+")
   ) {
     return new PrismaClient({
       log:

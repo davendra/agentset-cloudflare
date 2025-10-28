@@ -13,54 +13,30 @@ export const getNamespaceVectorStore = async (
     tenantId: tenant ?? undefined,
   };
 
-  // TODO: handle different embedding models
-  // NOTE: this technically should never happen because we should always have a vector store config
+  // Default to Cloudflare if no config provided
   if (!config) {
     config = {
-      provider: "MANAGED_PINECONE",
+      provider: "MANAGED_CLOUDFLARE",
     };
   }
 
   switch (config.provider) {
-    case "MANAGED_PINECONE":
-    case "MANAGED_PINECONE_OLD":
     case "PINECONE": {
       const { Pinecone } = await import("./pinecone/index");
 
-      let apiKey: string;
-      let indexHost: string;
-
-      if (config.provider === "MANAGED_PINECONE_OLD") {
-        apiKey = env.DEFAULT_PINECONE_API_KEY;
-        indexHost = env.DEFAULT_PINECONE_HOST;
-      } else if (config.provider === "MANAGED_PINECONE") {
-        apiKey = env.SECONDARY_PINECONE_API_KEY;
-        indexHost = env.SECONDARY_PINECONE_HOST;
-      } else {
-        apiKey = config.apiKey;
-        indexHost = config.indexHost;
-      }
-
       return new Pinecone({
-        apiKey,
-        indexHost,
+        apiKey: config.apiKey,
+        indexHost: config.indexHost,
         ...commonConfig,
       }) as VectorStore;
     }
 
-    case "MANAGED_TURBOPUFFER":
     case "TURBOPUFFER": {
       const { Turbopuffer } = await import("./turbopuffer/index");
 
       return new Turbopuffer({
-        apiKey:
-          config.provider === "MANAGED_TURBOPUFFER"
-            ? env.DEFAULT_TURBOPUFFER_API_KEY
-            : config.apiKey,
-        region:
-          config.provider === "MANAGED_TURBOPUFFER"
-            ? "aws-us-east-1"
-            : config.region,
+        apiKey: config.apiKey,
+        region: config.region,
         ...commonConfig,
       });
     }

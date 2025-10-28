@@ -3,15 +3,7 @@ import { z } from "zod/v4";
 
 export const env = createEnv({
   server: {
-    DEFAULT_PINECONE_API_KEY: z.string(),
-    DEFAULT_PINECONE_HOST: z.url(),
-
-    SECONDARY_PINECONE_API_KEY: z.string(),
-    SECONDARY_PINECONE_HOST: z.url(),
-
-    DEFAULT_TURBOPUFFER_API_KEY: z.string(),
-
-    // TODO: Make required once Cloudflare vector store is re-enabled
+    // Cloudflare vector store - primary provider
     DEFAULT_CLOUDFLARE_ENDPOINT: z.url().optional(),
     DEFAULT_CLOUDFLARE_API_KEY: z.string().optional(),
 
@@ -30,14 +22,6 @@ export const env = createEnv({
     PARTITION_API_URL: z.url(),
   },
   runtimeEnv: {
-    DEFAULT_PINECONE_API_KEY: process.env.DEFAULT_PINECONE_API_KEY,
-    DEFAULT_PINECONE_HOST: process.env.DEFAULT_PINECONE_HOST,
-
-    SECONDARY_PINECONE_API_KEY: process.env.SECONDARY_PINECONE_API_KEY,
-    SECONDARY_PINECONE_HOST: process.env.SECONDARY_PINECONE_HOST,
-
-    DEFAULT_TURBOPUFFER_API_KEY: process.env.DEFAULT_TURBOPUFFER_API_KEY,
-
     DEFAULT_CLOUDFLARE_ENDPOINT: process.env.DEFAULT_CLOUDFLARE_ENDPOINT,
     DEFAULT_CLOUDFLARE_API_KEY: process.env.DEFAULT_CLOUDFLARE_API_KEY,
 

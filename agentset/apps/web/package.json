@@ -23,7 +23,6 @@
     "@agentset/engine": "workspace:*",
     "@agentset/jobs": "workspace:*",
     "@agentset/storage": "workspace:*",
-    "@agentset/stripe": "workspace:*",
     "@agentset/ui": "workspace:*",
     "@agentset/utils": "workspace:*",
     "@agentset/validation": "workspace:*",

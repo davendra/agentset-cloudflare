@@ -29,7 +29,6 @@ const makeConfig = async (): Promise<NextConfig> => {
       "@agentset/engine",
       "@agentset/jobs",
       "@agentset/storage",
-      "@agentset/stripe",
       "@agentset/ui",
       "@agentset/utils",
       "@agentset/validation",

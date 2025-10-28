@@ -11,7 +11,6 @@ import { z } from "zod/v4";
 
 import { IngestJobStatus } from "@agentset/db";
 import { triggerReIngestJob } from "@agentset/jobs";
-import { isFreePlan } from "@agentset/stripe/plans";
 
 import { getNamespaceByUser } from "../auth";
 
@@ -111,17 +110,7 @@ export const ingestJobRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      // if it's not a pro plan, check if the user has exceeded the limit
-      // pro plan is unlimited with usage based billing
-      if (
-        isFreePlan(organization.plan) &&
-        organization.totalPages >= organization.pagesLimit
-      ) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "You've reached the maximum number of pages.",
-        });
-      }
+      // All users now have unlimited access - no plan limits
 
       return await createIngestJob({
         data: input,

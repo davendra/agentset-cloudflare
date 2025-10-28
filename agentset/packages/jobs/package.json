@@ -20,7 +20,6 @@
     "@agentset/db": "workspace:*",
     "@agentset/engine": "workspace:*",
     "@agentset/storage": "workspace:*",
-    "@agentset/stripe": "workspace:*",
     "@agentset/utils": "workspace:*",
     "@agentset/validation": "workspace:*",
     "@trigger.dev/sdk": "^4.0.2",

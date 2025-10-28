@@ -11,8 +11,6 @@ import {
   makeChunk,
 } from "@agentset/engine";
 import { env } from "@agentset/engine/env";
-import { meterIngestedPages } from "@agentset/stripe";
-import { isProPlan } from "@agentset/stripe/plans";
 import { chunkArray } from "@agentset/utils";
 
 import { getDb } from "../db";
@@ -243,27 +241,6 @@ export const processDocument = schemaTask({
     const keyBatches = chunkArray(keys, 150);
     for (const keyBatch of keyBatches) {
       await redis.del(...keyBatch);
-    }
-
-    let meterSuccess = null;
-
-    // Log usage to stripe
-    const stripeCustomerId = ingestJob.namespace.organization.stripeId;
-    if (
-      isProPlan(ingestJob.namespace.organization.plan) &&
-      !!stripeCustomerId &&
-      !shouldCleanup // don't log usage if re-processing
-    ) {
-      try {
-        await meterIngestedPages({
-          documentId: `doc_${document.id}`,
-          totalPages,
-          stripeCustomerId,
-        });
-        meterSuccess = true;
-      } catch {
-        meterSuccess = false;
-      }
     }
 
     const delta = totalPages - document.totalPages;

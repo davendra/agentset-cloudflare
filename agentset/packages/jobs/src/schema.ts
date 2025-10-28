@@ -2,17 +2,15 @@ import type { BatchItem } from "@trigger.dev/sdk";
 import { tasks } from "@trigger.dev/sdk";
 import { z } from "zod/v4";
 
-import { isEnterprisePlan, isProPlan } from "@agentset/stripe/plans";
 import {
   configSchema,
   EmbeddingConfigSchema,
   VectorStoreSchema,
 } from "@agentset/validation";
 
+// All plans now have unlimited access - no prioritization needed
 const getPriorityByPlan = (plan: string) => {
-  if (isEnterprisePlan(plan)) return;
-  if (isProPlan(plan)) return 3600 * 24; // 24 hours
-  return 3600 * 16; // 16 hours
+  return undefined; // No priority differences
 };
 
 export const TRIGGER_INGESTION_JOB_ID = "trigger-ingestion-job";

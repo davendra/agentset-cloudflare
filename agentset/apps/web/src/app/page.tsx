@@ -1,3 +1,6 @@
+// Force dynamic rendering so middleware can handle redirects
+export const dynamic = 'force-dynamic';
+
 export default function RootPage() {
   // This component should never actually render because middleware
   // redirects unauthenticated users to /login

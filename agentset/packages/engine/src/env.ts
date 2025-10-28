@@ -11,7 +11,8 @@ export const env = createEnv({
 
     DEFAULT_TURBOPUFFER_API_KEY: z.string(),
 
-    DEFAULT_CLOUDFLARE_ENDPOINT: z.url(),
+    // TODO: Make required once Cloudflare vector store is re-enabled
+    DEFAULT_CLOUDFLARE_ENDPOINT: z.url().optional(),
     DEFAULT_CLOUDFLARE_API_KEY: z.string().optional(),
 
     AZURE_SEARCH_URL: z.url(),

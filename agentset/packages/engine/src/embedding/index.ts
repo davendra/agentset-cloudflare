@@ -1,4 +1,3 @@
-import { AzureOpenAIProviderSettings } from "@ai-sdk/azure";
 import { EmbeddingModel } from "ai";
 
 import type { Namespace } from "@agentset/db";
@@ -15,40 +14,13 @@ export const getNamespaceEmbeddingModel = async (
   // NOTE: this technically should never happen because we should always have a embedding config
   if (!config) {
     config = {
-      provider: "MANAGED_OPENAI",
-      model: "text-embedding-3-large",
+      provider: "MANAGED_CLOUDFLARE",
+      model: "auto",
     };
   }
 
   let model: EmbeddingModel;
   switch (config.provider) {
-    case "MANAGED_OPENAI":
-    case "AZURE_OPENAI": {
-      const { createAzure } = await import("@ai-sdk/azure");
-
-      const settings: AzureOpenAIProviderSettings =
-        config.provider === "MANAGED_OPENAI"
-          ? {
-              resourceName: env.DEFAULT_AZURE_RESOURCE_NAME,
-              apiKey: env.DEFAULT_AZURE_API_KEY,
-              apiVersion: "preview",
-            }
-          : {
-              resourceName: config.resourceName,
-              apiKey: config.apiKey,
-              apiVersion: config.apiVersion,
-            };
-
-      const azure = createAzure(settings);
-      model = azure.textEmbeddingModel(
-        config.provider === "MANAGED_OPENAI"
-          ? env.DEFAULT_AZURE_EMBEDDING_DEPLOYMENT
-          : config.deployment,
-      );
-
-      break;
-    }
-
     case "OPENAI": {
       const { createOpenAI } = await import("@ai-sdk/openai");
 
@@ -78,14 +50,19 @@ export const getNamespaceEmbeddingModel = async (
 
     case "MANAGED_CLOUDFLARE": {
       // Cloudflare AI Search handles embeddings automatically
-      // Create a passthrough model that will be handled by the Cloudflare Worker
-      // The Worker uses AI Search's automatic embedding generation
+      // When documents are uploaded to AI Search, it automatically generates embeddings
+      // For query embeddings, we use Workers AI models
       const { createOpenAI } = await import("@ai-sdk/openai");
 
-      // Use OpenAI for compatibility, but this should ideally be handled by Cloudflare AI Search
-      // TODO: Replace with Cloudflare-native embedding when available
-      const openai = createOpenAI({ apiKey: env.OPENAI_API_KEY });
-      model = openai.textEmbeddingModel("text-embedding-3-small");
+      // Use Cloudflare Workers AI embedding model through AI Gateway
+      const cloudflare = createOpenAI({
+        apiKey: "dummy", // Not needed for Workers AI
+        baseURL: `https://gateway.ai.cloudflare.com/v1/${env.CLOUDFLARE_ACCOUNT_ID}/agentset-gateway/workers-ai`,
+        headers: {
+          "Authorization": `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+        },
+      });
+      model = cloudflare.textEmbeddingModel("@cf/baai/bge-base-en-v1.5");
       break;
     }
 

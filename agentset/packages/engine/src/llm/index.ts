@@ -5,19 +5,23 @@ import { DEFAULT_LLM, LLM } from "@agentset/validation";
 
 import { env } from "../env";
 
-// Cloudflare AI Gateway + OpenAI client
-const cloudflareGateway = createOpenAI({
-  apiKey: env.OPENAI_API_KEY,
-  baseURL: env.CLOUDFLARE_GATEWAY_URL,
+// Cloudflare Workers AI through AI Gateway
+// Uses Workers AI models (@cf/meta/llama, etc.) routed through AI Gateway
+const cloudflareWorkersAI = createOpenAI({
+  apiKey: "dummy", // Not needed for Workers AI, but required by SDK
+  baseURL: `https://gateway.ai.cloudflare.com/v1/${env.CLOUDFLARE_ACCOUNT_ID}/agentset-gateway/workers-ai`,
+  headers: {
+    "Authorization": `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+  },
 });
 
 const modelToId: Record<LLM, string> = {
-  "openai:gpt-4.1": "gpt-4o",
-  "openai:gpt-5": "gpt-4o",
-  "openai:gpt-5-mini": "gpt-4o-mini",
-  "openai:gpt-5-nano": "gpt-4o-mini",
+  "openai:gpt-4.1": "@cf/meta/llama-3.1-8b-instruct",
+  "openai:gpt-5": "@cf/meta/llama-3.1-70b-instruct",
+  "openai:gpt-5-mini": "@cf/meta/llama-3.1-8b-instruct",
+  "openai:gpt-5-nano": "@cf/qwen/qwen1.5-0.5b-chat",
 };
 
 export const getNamespaceLanguageModel = (model?: LLM): LanguageModel => {
-  return cloudflareGateway(modelToId[model ?? DEFAULT_LLM]);
+  return cloudflareWorkersAI(modelToId[model ?? DEFAULT_LLM]);
 };

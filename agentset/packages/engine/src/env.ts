@@ -7,15 +7,21 @@ export const env = createEnv({
     DEFAULT_CLOUDFLARE_ENDPOINT: z.url().optional(),
     DEFAULT_CLOUDFLARE_API_KEY: z.string().optional(),
 
-    AZURE_SEARCH_URL: z.url(),
-    AZURE_SEARCH_INDEX: z.string(),
-    AZURE_SEARCH_KEY: z.string(),
+    // Cloudflare AI Gateway for LLM
+    CLOUDFLARE_GATEWAY_URL: z.url(),
+    CLOUDFLARE_ACCOUNT_ID: z.string(),
+    CLOUDFLARE_GATEWAY_API_TOKEN: z.string(),
+    OPENAI_API_KEY: z.string(),
 
-    DEFAULT_AZURE_RESOURCE_NAME: z.string(),
-    DEFAULT_AZURE_API_KEY: z.string(),
-    DEFAULT_AZURE_EMBEDDING_DEPLOYMENT: z.string(),
+    // Azure (deprecated - will be removed)
+    AZURE_SEARCH_URL: z.url().optional(),
+    AZURE_SEARCH_INDEX: z.string().optional(),
+    AZURE_SEARCH_KEY: z.string().optional(),
 
-    DEFAULT_COHERE_API_KEY: z.string(),
+    DEFAULT_AZURE_RESOURCE_NAME: z.string().optional(),
+    DEFAULT_AZURE_API_KEY: z.string().optional(),
+    DEFAULT_AZURE_EMBEDDING_DEPLOYMENT: z.string().optional(),
+
     DEFAULT_ZEROENTROPY_API_KEY: z.string(),
 
     PARTITION_API_KEY: z.string(),
@@ -34,7 +40,6 @@ export const env = createEnv({
     DEFAULT_AZURE_EMBEDDING_DEPLOYMENT:
       process.env.DEFAULT_AZURE_EMBEDDING_DEPLOYMENT,
 
-    DEFAULT_COHERE_API_KEY: process.env.DEFAULT_COHERE_API_KEY,
     DEFAULT_ZEROENTROPY_API_KEY: process.env.DEFAULT_ZEROENTROPY_API_KEY,
 
     PARTITION_API_KEY: process.env.PARTITION_API_KEY,

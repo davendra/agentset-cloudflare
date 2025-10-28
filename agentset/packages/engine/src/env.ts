@@ -17,8 +17,10 @@ export const env = createEnv({
     AZURE_SEARCH_INDEX: z.string().optional(),
     AZURE_SEARCH_KEY: z.string().optional(),
 
-    PARTITION_API_KEY: z.string(),
-    PARTITION_API_URL: z.url(),
+    // Partition API (deprecated - replaced by Cloudflare AI Search document ingestion)
+    // Only needed if using legacy document upload flow
+    PARTITION_API_KEY: z.string().optional(),
+    PARTITION_API_URL: z.url().optional(),
   },
   runtimeEnv: {
     DEFAULT_CLOUDFLARE_ENDPOINT: process.env.DEFAULT_CLOUDFLARE_ENDPOINT,

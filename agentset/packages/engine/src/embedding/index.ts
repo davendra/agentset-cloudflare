@@ -52,6 +52,13 @@ export const getNamespaceEmbeddingModel = async (
       // Cloudflare AI Search handles embeddings automatically
       // When documents are uploaded to AI Search, it automatically generates embeddings
       // For query embeddings, we use Workers AI models
+
+      if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_API_TOKEN) {
+        throw new Error(
+          "Cloudflare Workers AI is not configured. Please set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN environment variables."
+        );
+      }
+
       const { createOpenAI } = await import("@ai-sdk/openai");
 
       // Use Cloudflare Workers AI embedding model through AI Gateway

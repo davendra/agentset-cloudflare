@@ -8,8 +8,8 @@ export const env = createEnv({
     DEFAULT_CLOUDFLARE_API_KEY: z.string().optional(),
 
     // Cloudflare AI Gateway for LLM (uses Workers AI models)
-    CLOUDFLARE_ACCOUNT_ID: z.string(),
-    CLOUDFLARE_API_TOKEN: z.string(),
+    CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
+    CLOUDFLARE_API_TOKEN: z.string().optional(),
 
     // Azure Search (deprecated - only for legacy keyword search)
     // TODO: Migrate keyword search to Cloudflare AI Search

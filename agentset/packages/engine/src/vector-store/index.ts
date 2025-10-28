@@ -66,23 +66,26 @@ export const getNamespaceVectorStore = async (
     }
 
     // TODO: Re-enable Cloudflare once @agentset/cloudflare-tools package is created
-    // case "MANAGED_CLOUDFLARE":
-    // case "CLOUDFLARE": {
-    //   const { CloudflareVectorStore } = await import("./cloudflare/index");
+    case "MANAGED_CLOUDFLARE":
+    case "CLOUDFLARE": {
+      throw new Error(
+        "Cloudflare vector store is temporarily disabled. Please use Pinecone, Turbopuffer, or Azure instead."
+      );
+      // const { CloudflareVectorStore } = await import("./cloudflare/index");
 
-    //   return new CloudflareVectorStore({
-    //     endpoint:
-    //       config.provider === "MANAGED_CLOUDFLARE"
-    //         ? env.DEFAULT_CLOUDFLARE_ENDPOINT
-    //         : config.endpoint,
-    //     apiKey:
-    //       config.provider === "MANAGED_CLOUDFLARE"
-    //         ? env.DEFAULT_CLOUDFLARE_API_KEY
-    //         : config.apiKey,
-    //     workspaceId: config.provider === "CLOUDFLARE" ? config.workspaceId : undefined,
-    //     ...commonConfig,
-    //   }) as VectorStore;
-    // }
+      // return new CloudflareVectorStore({
+      //   endpoint:
+      //     config.provider === "MANAGED_CLOUDFLARE"
+      //       ? env.DEFAULT_CLOUDFLARE_ENDPOINT
+      //       : config.endpoint,
+      //   apiKey:
+      //     config.provider === "MANAGED_CLOUDFLARE"
+      //       ? env.DEFAULT_CLOUDFLARE_API_KEY
+      //       : config.apiKey,
+      //   workspaceId: config.provider === "CLOUDFLARE" ? config.workspaceId : undefined,
+      //   ...commonConfig,
+      // }) as VectorStore;
+    }
 
     default: {
       // This exhaustive check ensures TypeScript will error if a new provider

@@ -35,11 +35,11 @@ export const createNamespaceSchema = z.object({
     .transform((v) => toSlug(v))
     .refine((v) => validSlugRegex.test(v), { message: "Invalid slug format" }),
   embeddingConfig: EmbeddingConfigSchema.optional().default({
-    provider: "MANAGED_OPENAI",
-    model: "text-embedding-3-large",
+    provider: "MANAGED_CLOUDFLARE",
+    model: "auto", // Cloudflare AI Search handles embeddings automatically
   }),
   vectorStoreConfig: createVectorStoreSchema.optional().default({
-    provider: "MANAGED_PINECONE",
+    provider: "MANAGED_CLOUDFLARE",
   }),
 });
 

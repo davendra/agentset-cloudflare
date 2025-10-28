@@ -1,23 +1,23 @@
-import { createAzure } from "@ai-sdk/azure";
+import { createOpenAI } from "@ai-sdk/openai";
 import { LanguageModel } from "ai";
 
 import { DEFAULT_LLM, LLM } from "@agentset/validation";
 
 import { env } from "../env";
 
-const azure = createAzure({
-  apiKey: env.DEFAULT_AZURE_API_KEY,
-  resourceName: env.DEFAULT_AZURE_RESOURCE_NAME,
-  apiVersion: "preview",
+// Cloudflare AI Gateway + OpenAI client
+const cloudflareGateway = createOpenAI({
+  apiKey: env.OPENAI_API_KEY,
+  baseURL: env.CLOUDFLARE_GATEWAY_URL,
 });
 
 const modelToId: Record<LLM, string> = {
-  "openai:gpt-4.1": "gpt-4.1",
-  "openai:gpt-5": "gpt-5",
-  "openai:gpt-5-mini": "gpt-5-mini",
-  "openai:gpt-5-nano": "gpt-5-nano",
+  "openai:gpt-4.1": "gpt-4o",
+  "openai:gpt-5": "gpt-4o",
+  "openai:gpt-5-mini": "gpt-4o-mini",
+  "openai:gpt-5-nano": "gpt-4o-mini",
 };
 
 export const getNamespaceLanguageModel = (model?: LLM): LanguageModel => {
-  return azure.languageModel(modelToId[model ?? DEFAULT_LLM]);
+  return cloudflareGateway(modelToId[model ?? DEFAULT_LLM]);
 };

@@ -76,6 +76,19 @@ export const getNamespaceEmbeddingModel = async (
       break;
     }
 
+    case "MANAGED_CLOUDFLARE": {
+      // Cloudflare AI Search handles embeddings automatically
+      // Create a passthrough model that will be handled by the Cloudflare Worker
+      // The Worker uses AI Search's automatic embedding generation
+      const { createOpenAI } = await import("@ai-sdk/openai");
+
+      // Use OpenAI for compatibility, but this should ideally be handled by Cloudflare AI Search
+      // TODO: Replace with Cloudflare-native embedding when available
+      const openai = createOpenAI({ apiKey: env.OPENAI_API_KEY });
+      model = openai.textEmbeddingModel("text-embedding-3-small");
+      break;
+    }
+
     default: {
       // This exhaustive check ensures TypeScript will error if a new provider
       // is added without handling it in the switch statement

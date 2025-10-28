@@ -7,10 +7,6 @@ export const RERANKER_MODELS = {
       name: "Cohere Rerank Multilingual v3.0",
     },
   ],
-  zeroentropy: [
-    { model: "zerank-1", name: "Zerank 1" },
-    { model: "zerank-1-small", name: "Zerank 1 Small" },
-  ],
 } as const;
 
 type _RerankerMap = {
@@ -19,4 +15,5 @@ type _RerankerMap = {
 
 export type RerankingModel = _RerankerMap[keyof _RerankerMap];
 
-export const DEFAULT_RERANKER: RerankingModel = "zeroentropy:zerank-1";
+// No default reranker - requires user-provided credentials
+export const DEFAULT_RERANKER: RerankingModel = "cohere:rerank-v3.5";

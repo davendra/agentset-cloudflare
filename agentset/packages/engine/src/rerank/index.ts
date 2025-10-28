@@ -16,15 +16,8 @@ export const getRerankingModel = async (_model?: RerankingModel) => {
   switch (provider) {
     case "cohere": {
       throw new Error(
-        "Cohere reranking requires user-provided API key. Please contact support to configure custom reranker credentials.",
+        "Reranking requires user-provided API key. Please contact support to configure custom reranker credentials.",
       );
-    }
-
-    case "zeroentropy": {
-      const { ZeroentropyReranker } = await import("./zeroentropy");
-      return new ZeroentropyReranker(modelName, {
-        apiKey: env.DEFAULT_ZEROENTROPY_API_KEY,
-      });
     }
 
     default: {

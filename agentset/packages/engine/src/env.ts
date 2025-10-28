@@ -11,6 +11,12 @@ export const env = createEnv({
     CLOUDFLARE_ACCOUNT_ID: z.string(),
     CLOUDFLARE_API_TOKEN: z.string(),
 
+    // Azure Search (deprecated - only for legacy keyword search)
+    // TODO: Migrate keyword search to Cloudflare AI Search
+    AZURE_SEARCH_URL: z.url().optional(),
+    AZURE_SEARCH_INDEX: z.string().optional(),
+    AZURE_SEARCH_KEY: z.string().optional(),
+
     PARTITION_API_KEY: z.string(),
     PARTITION_API_URL: z.url(),
   },
@@ -20,6 +26,10 @@ export const env = createEnv({
 
     CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
     CLOUDFLARE_API_TOKEN: process.env.CLOUDFLARE_API_TOKEN,
+
+    AZURE_SEARCH_URL: process.env.AZURE_SEARCH_URL,
+    AZURE_SEARCH_INDEX: process.env.AZURE_SEARCH_INDEX,
+    AZURE_SEARCH_KEY: process.env.AZURE_SEARCH_KEY,
 
     PARTITION_API_KEY: process.env.PARTITION_API_KEY,
     PARTITION_API_URL: process.env.PARTITION_API_URL,

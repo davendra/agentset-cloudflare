@@ -12,7 +12,6 @@ import { createIngestJob } from "@/services/ingest-jobs/create";
 import { getPaginationArgs, paginateResults } from "@/services/pagination";
 
 import { db, Prisma } from "@agentset/db";
-import { isFreePlan } from "@agentset/stripe/plans";
 
 export const GET = withNamespaceApiHandler(
   async ({ searchParams, namespace, tenantId, headers }) => {
@@ -62,21 +61,7 @@ export const GET = withNamespaceApiHandler(
 
 export const POST = withNamespaceApiHandler(
   async ({ req, namespace, tenantId, headers, organization }) => {
-    // if it's not a pro plan, check if the user has exceeded the limit
-    // pro plan is unlimited with usage based billing
-    if (
-      isFreePlan(organization.plan) &&
-      organization.totalPages >= organization.pagesLimit
-    ) {
-      throw new AgentsetApiError({
-        code: "rate_limit_exceeded",
-        message: exceededLimitError({
-          plan: organization.plan,
-          limit: organization.pagesLimit,
-          type: "pages",
-        }),
-      });
-    }
+    // All users now have unlimited access - no plan limits
 
     const body = await createIngestJobSchema.parseAsync(
       await parseRequestBody(req),

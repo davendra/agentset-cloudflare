@@ -8,7 +8,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { isFreePlan } from "@agentset/stripe/plans";
 import { Button } from "@agentset/ui/button";
 import {
   Dialog,
@@ -56,11 +55,8 @@ export function IngestModal() {
   const isPending =
     queryClient.isMutating(trpc.ingestJob.ingest.mutationOptions()) > 0;
 
-  // if it's not a pro plan, check if the user has exceeded the limit
-  // pro plan is unlimited with usage based billing
-  const isOverLimit =
-    isFreePlan(organization.plan) &&
-    organization.totalPages >= organization.pagesLimit;
+  // All users now have unlimited access - no limits
+  const isOverLimit = false;
 
   return (
     <Dialog

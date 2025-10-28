@@ -2,7 +2,6 @@ import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { useRouterStuff } from "@/hooks/use-router-stuff";
 
-import { PLANS, PRO_PLAN } from "@agentset/stripe/plans";
 import { Button } from "@agentset/ui/button";
 import {
   Dialog,
@@ -38,11 +37,8 @@ function WelcomeModal({
   //   handlePlanUpgrade();
   // }, [searchParams, planId]);
 
-  const plan = planId
-    ? (PLANS.find(
-        (p) => p.name.toLowerCase() === planId.replace("+", " ").toLowerCase(),
-      ) ?? PRO_PLAN)
-    : undefined;
+  // No plans anymore - everyone has unlimited access
+  const plan = undefined;
 
   const handleClose = () => {
     setShowWelcomeModal(false);

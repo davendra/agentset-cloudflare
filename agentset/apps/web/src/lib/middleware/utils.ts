@@ -5,12 +5,13 @@ import { SHORT_DOMAIN } from "../constants";
 // import { SHORT_DOMAIN } from "@/lib/constants";
 
 export const parse = (req: NextRequest) => {
-  let domain = req.headers.get("host") as string;
+  // Use nextUrl.hostname for Edge runtime compatibility (more reliable than headers)
+  let domain = req.nextUrl.hostname || req.headers.get("host") || "";
   // path is the path of the URL (e.g. agentset.ai/stats/github -> /stats/github)
   const path = req.nextUrl.pathname;
 
   // remove www. from domain and convert to lowercase
-  domain = domain.replace(/^www./, "").toLowerCase();
+  domain = domain.replace(/^www\./, "").toLowerCase();
 
   // if (domain === "agentset.localhost:8888" || domain.endsWith(".vercel.app")) {
   if (domain.endsWith(".vercel.app")) {

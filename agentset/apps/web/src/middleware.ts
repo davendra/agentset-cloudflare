@@ -1,4 +1,5 @@
 import type { NextFetchEvent, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { API_HOSTNAMES, APP_HOSTNAMES } from "./lib/constants";
 import ApiMiddleware from "./lib/middleware/api";
@@ -21,27 +22,37 @@ export const config = {
 };
 
 export function middleware(request: NextRequest, event: NextFetchEvent) {
-  const { domain } = parse(request);
+  try {
+    const { domain } = parse(request);
 
-  // DEBUG: Log middleware routing
-  console.log('[MIDDLEWARE DEBUG]', {
-    domain,
-    path: request.nextUrl.pathname,
-    APP_HOSTNAMES: Array.from(APP_HOSTNAMES),
-    isAppHostname: APP_HOSTNAMES.has(domain),
-    isApiHostname: API_HOSTNAMES.has(domain),
-  });
+    // DEBUG: Log middleware routing
+    console.log('[MIDDLEWARE DEBUG]', {
+      domain,
+      path: request.nextUrl.pathname,
+      APP_HOSTNAMES: Array.from(APP_HOSTNAMES),
+      isAppHostname: APP_HOSTNAMES.has(domain),
+      isApiHostname: API_HOSTNAMES.has(domain),
+    });
 
-  // for App
-  if (APP_HOSTNAMES.has(domain)) {
-    return AppMiddleware(request, event);
+    // for App
+    if (APP_HOSTNAMES.has(domain)) {
+      return AppMiddleware(request, event);
+    }
+
+    // for API
+    if (API_HOSTNAMES.has(domain)) {
+      return ApiMiddleware(request);
+    }
+
+    // for Custom Domain
+    return HostingMiddleware(request, event);
+  } catch (error) {
+    // Never let middleware crash the entire request
+    console.error('[MIDDLEWARE ERROR]', error);
+
+    // Add header to identify degraded requests
+    const response = NextResponse.next();
+    response.headers.set('x-middleware-error', '1');
+    return response;
   }
-
-  // for API
-  if (API_HOSTNAMES.has(domain)) {
-    return ApiMiddleware(request);
-  }
-
-  // for Custom Domain
-  return HostingMiddleware(request, event);
 }

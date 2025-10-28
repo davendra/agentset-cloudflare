@@ -25,17 +25,21 @@ export function middleware(request: NextRequest, event: NextFetchEvent) {
   try {
     const { domain } = parse(request);
 
+    // Check if this is a Vercel deployment (preview or production)
+    const isVercelDeployment = domain.endsWith('.vercel.app');
+
     // DEBUG: Log middleware routing
     console.log('[MIDDLEWARE DEBUG]', {
       domain,
       path: request.nextUrl.pathname,
+      isVercelDeployment,
       APP_HOSTNAMES: Array.from(APP_HOSTNAMES),
       isAppHostname: APP_HOSTNAMES.has(domain),
       isApiHostname: API_HOSTNAMES.has(domain),
     });
 
-    // for App
-    if (APP_HOSTNAMES.has(domain)) {
+    // for App - include Vercel deployments
+    if (APP_HOSTNAMES.has(domain) || isVercelDeployment) {
       return AppMiddleware(request, event);
     }
 

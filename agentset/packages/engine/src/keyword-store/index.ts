@@ -33,11 +33,24 @@ const topLevelMetadataKeys = [
   "tenantId",
 ] satisfies (keyof KeywordSearchChunk)[];
 
-const keywordSearchClient = new SearchClient<KeywordSearchChunk>(
-  env.AZURE_SEARCH_URL,
-  env.AZURE_SEARCH_INDEX,
-  new AzureKeyCredential(env.AZURE_SEARCH_KEY),
-);
+let keywordSearchClient: SearchClient<KeywordSearchChunk> | null = null;
+
+function getKeywordSearchClient() {
+  if (!keywordSearchClient) {
+    if (!env.AZURE_SEARCH_URL || !env.AZURE_SEARCH_INDEX || !env.AZURE_SEARCH_KEY) {
+      throw new Error(
+        "Azure Search is not configured. Please set AZURE_SEARCH_URL, AZURE_SEARCH_INDEX, and AZURE_SEARCH_KEY environment variables. " +
+        "Note: Azure Search is deprecated. Please migrate to Cloudflare AI Search."
+      );
+    }
+    keywordSearchClient = new SearchClient<KeywordSearchChunk>(
+      env.AZURE_SEARCH_URL,
+      env.AZURE_SEARCH_INDEX,
+      new AzureKeyCredential(env.AZURE_SEARCH_KEY),
+    );
+  }
+  return keywordSearchClient;
+}
 
 const safeParse = (json: string) => {
   try {
@@ -96,7 +109,7 @@ export class KeywordStore {
     if (documentId) filter += ` and documentId eq '${documentId}'`;
     if (extraFilter) filter += ` and ${extraFilter}`;
 
-    const results = await keywordSearchClient.search(query, {
+    const results = await getKeywordSearchClient().search(query, {
       filter,
       top: limit,
       skip: (page - 1) * limit,
@@ -167,7 +180,7 @@ export class KeywordStore {
     if (this.tenantId) filter += ` and tenantId eq '${this.tenantId}'`;
     if (documentId) filter += ` and documentId eq '${documentId}'`;
 
-    const results = await keywordSearchClient.search(undefined, {
+    const results = await getKeywordSearchClient().search(undefined, {
       filter,
       top: limit,
       select: ["id"],
@@ -202,7 +215,7 @@ export class KeywordStore {
       metadata?: Record<string, unknown>;
     }[],
   ) {
-    await keywordSearchClient.mergeOrUploadDocuments(
+    await getKeywordSearchClient().mergeOrUploadDocuments(
       chunks.map((chunk) => {
         const metadata = chunk.metadata ?? {};
 
@@ -237,7 +250,7 @@ export class KeywordStore {
   }
 
   async deleteByIds(ids: string[]) {
-    await keywordSearchClient.deleteDocuments(
+    await getKeywordSearchClient().deleteDocuments(
       "id",
       ids.map((id) => this.encodeId(id)),
     );

@@ -1,63 +1,83 @@
 # AgentSet × Cloudflare Integration Workspace
 
-This workspace contains the AgentSet × Cloudflare integration project and related development tools.
+**Status**: 🟢 **BACKEND DEPLOYED** | 🟡 **FRONTEND CODE COMPLETE**
 
-## 📁 Repository Structure
+This workspace contains the AgentSet × Cloudflare integration project with a **live, operational Cloudflare Worker** integrating AI Search and AI Gateway.
 
-### Main Project
+> **Live Worker**: https://agentset-ai-search.davendra.workers.dev
 
-**[agentset-cloudflare-app/](./agentset-cloudflare-app/)** - Integration repository
-The main project that connects AgentSet UI with Cloudflare AI services.
+## 📁 Workspace Structure
 
-- **apps/cf-worker/** - Cloudflare Worker implementation
-- **packages/agentset-tools/** - Client library for Worker communication
-- **docs/integration/** - Complete integration documentation
-- **INTEGRATION_OVERVIEW.md** - Start here for project overview
+```
+agentset-cloudflare/                    # Development workspace (not a git repo)
+├── agentset-cloudflare-app/            # Main project (git repo) ✅ DEPLOYED
+│   ├── apps/cf-worker/                 # Cloudflare Worker (LIVE)
+│   ├── packages/agentset-tools/        # TypeScript client library
+│   ├── docs/integration/               # Integration documentation
+│   ├── STATUS.md                       # Current project status
+│   └── INTEGRATION_OVERVIEW.md         # Complete overview
+│
+├── agentset/                           # AgentSet UI monorepo (git repo)
+│   ├── apps/web/                       # Frontend implementation ✅ COMPLETE
+│   ├── packages/cloudflare-tools/      # Copied from agentset-tools
+│   └── packages/db/                    # Database schema ✅ UPDATED
+│
+├── .claude/                            # Claude Code agents
+├── .claude-collective/                 # Multi-agent system
+└── .taskmaster/                        # Project management
+```
 
-### Development Repositories
+### Repository Details
 
-**agentset/** - AgentSet UI monorepo (cloned for development)
-- Not tracked in this workspace
-- Clone separately: `git clone https://github.com/agentset-ai/agentset.git`
+**agentset-cloudflare-app/** - Main Integration Project
+- **Git repository**: https://github.com/davendra/agentset-cloudflare-app
+- **Status**: Backend deployed and operational
+- **Contains**: Worker code, integration docs, test results
 
-### Development Tools
-
-- **.claude/** - Claude Code agent system for AI-assisted development
-- **.claude-collective/** - Multi-agent collective system configuration
-- **.taskmaster/** - Task Master project management
+**agentset/** - AgentSet UI (Development)
+- **Git repository**: https://github.com/agentset-ai/agentset
+- **Status**: Frontend code complete, untested
+- **Contains**: UI components, tRPC router, database schema
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Review Project Documentation
+### 1. Check Current Status
 
 ```bash
 cd agentset-cloudflare-app
-cat INTEGRATION_OVERVIEW.md
+cat STATUS.md  # Current deployment status and next steps
 ```
 
-### 2. Read Integration Guides
+### 2. Test the Live Worker
 
+```bash
+# Health check
+curl https://agentset-ai-search.davendra.workers.dev/health
+
+# Test search
+curl -X POST https://agentset-ai-search.davendra.workers.dev/search \
+  -H 'Content-Type: application/json' \
+  -d '{"query": "invoice", "filters": {"tenantId": "test"}}'
+```
+
+### 3. Review Documentation
+
+- **[STATUS.md](./agentset-cloudflare-app/STATUS.md)** - Current project status
 - **[Integration Overview](./agentset-cloudflare-app/INTEGRATION_OVERVIEW.md)** - Complete picture
+- **[Test Results](./agentset-cloudflare-app/apps/cf-worker/INTEGRATION_TEST_RESULTS.md)** - Comprehensive testing
 - **[Architecture Guide](./agentset-cloudflare-app/docs/integration/architecture.md)** - System design
-- **[Integration Guide](./agentset-cloudflare-app/docs/integration/integration-guide.md)** - Implementation steps
-- **[Frontend Plan](./agentset-cloudflare-app/docs/integration/frontend-integration-plan.md)** - UI changes
 
-### 3. Clone AgentSet UI (if needed)
+### 4. Explore Frontend Implementation
 
 ```bash
-git clone https://github.com/agentset-ai/agentset.git
 cd agentset
-pnpm install
-```
-
-### 4. Setup Cloudflare Worker
-
-```bash
-cd agentset-cloudflare-app/apps/cf-worker
-pnpm install
-npx wrangler dev  # Local development
+# Note: Dev server currently blocked by dependencies
+# All frontend code is complete in:
+# - apps/web/src/app/.../settings/cloudflare/
+# - apps/web/src/server/api/routers/cloudflare.ts
+# - packages/cloudflare-tools/
 ```
 
 ---
@@ -191,6 +211,24 @@ See [agentset-cloudflare-app/LICENSE.md](./agentset-cloudflare-app/LICENSE.md) f
 
 ---
 
-**Last Updated**: October 26, 2025
-**Status**: Ready for Implementation
-# Trigger deployment
+---
+
+## 📈 Current Status
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| Cloudflare Worker | 🟢 Deployed | Live and operational |
+| AI Search Integration | 🟢 Operational | 5 documents indexed |
+| AI Gateway Integration | 🟢 Operational | Gemini 2.5 Pro configured |
+| Database Schema | 🟢 Complete | Cloudflare fields added |
+| tRPC Router | 🟢 Complete | 5 endpoints implemented |
+| Settings UI | 🟡 Complete (Untested) | 5-tab interface built |
+| Metrics Dashboard | 🟡 Complete (Untested) | KPI cards and charts |
+| Frontend Testing | 🔴 Blocked | Dev server dependencies |
+
+**See [STATUS.md](./agentset-cloudflare-app/STATUS.md) for detailed status and next steps.**
+
+---
+
+**Last Updated**: October 28, 2025
+**Worker Live Since**: October 27, 2025

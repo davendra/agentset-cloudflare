@@ -3,10 +3,9 @@ import { z } from "zod/v4";
 
 import { env as engineEnv } from "@agentset/engine/env";
 import { env as storageEnv } from "@agentset/storage/env";
-import { env as stripeEnv } from "@agentset/stripe/env";
 
 export const env = createEnv({
-  extends: [engineEnv, storageEnv, stripeEnv],
+  extends: [engineEnv, storageEnv],
   shared: {
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -41,8 +40,6 @@ export const env = createEnv({
 
     REDIS_URL: z.url(),
     REDIS_TOKEN: z.string(),
-
-    STRIPE_WEBHOOK_SECRET: z.string(),
 
     DISCORD_HOOK_ALERTS: z.url().optional(),
     DISCORD_HOOK_CRON: z.url().optional(),
@@ -81,8 +78,6 @@ export const env = createEnv({
 
     REDIS_URL: process.env.REDIS_URL,
     REDIS_TOKEN: process.env.REDIS_TOKEN,
-
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
 
     DISCORD_HOOK_ALERTS: process.env.DISCORD_HOOK_ALERTS,
     DISCORD_HOOK_CRON: process.env.DISCORD_HOOK_CRON,

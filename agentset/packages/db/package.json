@@ -26,9 +26,6 @@
     "@prisma/adapter-pg": "^6.16.2",
     "@prisma/client": "^6.16.2"
   },
-  "prisma": {
-    "schema": "prisma/schema"
-  },
   "devDependencies": {
     "@agentset/eslint-config": "workspace:*",
     "@agentset/prettier-config": "workspace:*",

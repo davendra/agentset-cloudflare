@@ -1,291 +1,204 @@
-# CI/CD Configuration
+# GitHub Workflows & Automation
 
-This directory contains GitHub Actions workflows for automated testing, linting, and code quality checks for the AgentSet Cloudflare integration.
+This directory contains GitHub Actions workflows for the **AgentSet × Cloudflare** workspace.
 
-## Workflows
+## 🚀 Overview
 
-### 1. CI Workflow (`ci.yml`)
+The workspace uses GitHub Actions for:
+- **Automated PR labeling** based on changed files
+- **Auto-merge functionality** for approved PRs
+- **Workflow organization** for both workspace and submodule repositories
 
-**Triggers:**
-- Push to `main` or `develop` branches
-- Pull requests to `main` or `develop` branches
-- Manual trigger via `workflow_dispatch`
+## 📂 Directory Structure
 
-**Jobs:**
-
-#### Test Job
-- Runs unit and integration tests for all packages
-- Tests `@agentset/cloudflare-tools`, `@agentset/engine`, and `@agentset/web`
-- Uploads test results as artifacts (retained for 7 days)
-- **Timeout:** 15 minutes
-
-#### Type Check Job
-- Validates TypeScript types across the entire monorepo
-- Generates Prisma types before type checking
-- Ensures no type errors exist
-- **Timeout:** 10 minutes
-
-#### Lint Job
-- Runs ESLint on all code
-- Runs Prettier format checks
-- Ensures code style consistency
-- **Timeout:** 10 minutes
-
-#### Security Job
-- Runs security-focused test suite
-- Validates authentication, authorization, and input validation
-- Uploads security test results as artifacts
-- **Timeout:** 10 minutes
-
-#### Build Job
-- Validates that all packages build successfully
-- Generates necessary types and dependencies
-- **Timeout:** 15 minutes
-
-#### Quality Gate Job
-- Waits for all previous jobs to complete
-- Fails if any job fails (except security which is optional)
-- Posts results to PR as a comment
-- **Always runs** to provide status feedback
-
-### 2. Coverage Workflow (`coverage.yml`)
-
-**Triggers:**
-- Push to `main` branch
-- Pull requests to `main` branch
-- Manual trigger via `workflow_dispatch`
-
-**Jobs:**
-
-#### Coverage Report
-- Runs tests with coverage tracking
-- Generates coverage reports for all packages
-- Uploads coverage to Codecov (if token configured)
-- Generates coverage summary in GitHub Actions summary
-- Uploads coverage artifacts (retained for 14 days)
-- **Quality Gate:** Reports coverage but does not fail build
-- **Timeout:** 15 minutes
-
-## Configuration
-
-### Environment Variables
-
-Both workflows use:
-- `NODE_VERSION: 22.12.0` - Node.js version
-- `PNPM_VERSION: 9.15.4` - pnpm package manager version
-
-### Secrets Required
-
-#### For Coverage Workflow:
-- `CODECOV_TOKEN` (optional): Token for uploading coverage to Codecov
-
-#### For Future Deployment Workflows:
-- `CLOUDFLARE_API_TOKEN`: Cloudflare API token for Worker deployment
-- `CLOUDFLARE_ACCOUNT_ID`: Cloudflare account ID
-- `CF_GATEWAY_URL`: Gateway endpoint URL
-- `CF_GATEWAY_TOKEN`: Gateway authentication token
-
-## Adding Test Scripts
-
-To enable tests in the CI workflows, add these scripts to package.json files:
-
-### For `agentset/packages/engine/package.json`:
-```json
-{
-  "scripts": {
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
-  }
-}
+```
+.github/
+├── README.md              # This file
+├── labeler.yml            # Label configuration for auto-labeling PRs
+├── workflows/             # GitHub Actions workflows
+│   ├── auto-merge.yml     # Automatic PR merging with automerge label
+│   └── labeler.yml        # PR auto-labeling workflow
+└── codeql/                # CodeQL security scanning configuration
 ```
 
-### For `agentset/packages/cloudflare-tools/package.json`:
-```json
-{
-  "scripts": {
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
-  },
-  "devDependencies": {
-    "vitest": "^2.0.0",
-    "@vitest/coverage-v8": "^2.0.0"
-  }
-}
-```
+## 🔄 Active Workflows
 
-### For `agentset/apps/web/package.json`:
-```json
-{
-  "scripts": {
-    "test": "vitest run",
-    "test:unit": "vitest run src/**/*.test.ts",
-    "test:integration": "vitest run src/**/*.integration.test.ts",
-    "test:security": "vitest run src/**/*.security.test.ts",
-    "test:performance": "vitest run src/**/*.performance.test.ts",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
-  },
-  "devDependencies": {
-    "vitest": "^2.0.0",
-    "@vitest/coverage-v8": "^2.0.0"
-  }
-}
-```
+### 1. PR Auto-Labeling (`labeler.yml`)
 
-## Running Workflows Locally
+**Triggers**: Pull request events (opened, synchronized, reopened)
 
-### Prerequisites
+**Purpose**: Automatically labels PRs based on which files are changed
+
+**Configuration**: Labels defined in `.github/labeler.yml`
+
+**Example Labels**:
+- `documentation` - Changes to `.md` files
+- `worker` - Changes to Worker code
+- `frontend` - Changes to AgentSet UI
+- `infrastructure` - Changes to Terraform/deployment files
+
+### 2. Auto-Merge (`auto-merge.yml`)
+
+**Triggers**: PRs labeled with `automerge`
+
+**Purpose**: Automatically merges approved PRs that pass all checks
+
+**Features**:
+- Waits for all status checks to pass
+- Uses squash merge strategy
+- Skips draft PRs
+- Requires PR approval (if branch protection enabled)
+
+**Usage**:
 ```bash
-# Install dependencies
-pnpm install
-
-# Generate Prisma types
-cd agentset
-pnpm db:generate
+# Add automerge label to PR
+gh pr edit <number> --add-label automerge
 ```
 
-### Run Tests
+## 📋 Submodule Workflows
+
+The **agentset-cloudflare-app** submodule has its own comprehensive CI/CD:
+
+- **Worker Deployment** - Automated Cloudflare Worker deployment
+- **Testing** - Unit, integration, and Worker-specific tests
+- **Linting** - ESLint, Prettier, Markdown, Terraform validation
+- **Security** - CodeQL, dependency scanning, secret detection
+- **Release Management** - Automated versioning and changelog
+
+**See**: [`agentset-cloudflare-app/.github/workflows/README.md`](../agentset-cloudflare-app/.github/workflows/README.md)
+
+## 🏷️ Available Labels
+
+### Auto-Applied Labels
+
+These labels are automatically applied based on changed files:
+
+| Label | Applied When |
+|-------|--------------|
+| `documentation` | Markdown files changed |
+| `worker` | Worker source code changed |
+| `frontend` | AgentSet UI code changed |
+| `infrastructure` | Terraform or deployment configs changed |
+| `dependencies` | Package.json or lock files changed |
+| `ci` | GitHub Actions workflows changed |
+
+### Manual Labels
+
+These labels are manually applied to control workflows:
+
+| Label | Purpose |
+|-------|---------|
+| `automerge` | Enable automatic merging when checks pass |
+| `needs-review` | Request review before merging |
+| `enhancement` | Feature requests and improvements |
+| `bug` | Bug fixes |
+| `breaking-change` | Breaking API changes |
+
+## 🛠️ Workflow Configuration
+
+### Enable Auto-Merge for PRs
+
 ```bash
-cd agentset
+# Via GitHub CLI
+gh pr edit <number> --add-label automerge
 
-# Run all tests
-pnpm --filter @agentset/engine test
-pnpm --filter @agentset/cloudflare-tools test
-pnpm --filter @agentset/web test
-
-# Run specific test suites
-pnpm --filter @agentset/web test:unit
-pnpm --filter @agentset/web test:integration
-pnpm --filter @agentset/web test:security
-pnpm --filter @agentset/web test:performance
+# Or via GitHub UI
+# Add "automerge" label to the PR
 ```
 
-### Run Type Check
+### Customize Auto-Labeling
+
+Edit `.github/labeler.yml` to add new label rules:
+
+```yaml
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.md'
+
+worker:
+  - changed-files:
+    - any-glob-to-any-file: 'agentset-cloudflare-app/apps/cf-worker/**/*'
+```
+
+## 📊 Monitoring Workflows
+
+### View Workflow Runs
+
 ```bash
-cd agentset
-pnpm typecheck
+# List recent workflow runs
+gh run list
+
+# View specific run details
+gh run view <run-id>
+
+# Watch a run in progress
+gh run watch
 ```
 
-### Run Lint
+### Check PR Status
+
 ```bash
-cd agentset
-pnpm lint
-pnpm format
+# View PR checks
+gh pr checks <number>
+
+# View PR details
+gh pr view <number>
 ```
 
-### Run Coverage
-```bash
-cd agentset
-pnpm --filter @agentset/engine test:coverage
-pnpm --filter @agentset/cloudflare-tools test:coverage
-pnpm --filter @agentset/web test:coverage
-```
+## 🔐 Required Permissions
 
-## CI/CD Best Practices
+For workflows to function properly, ensure:
 
-### Pull Request Workflow
-1. Create feature branch from `develop`
-2. Make changes and commit
-3. Push to GitHub - CI workflow triggers automatically
-4. Review CI results in PR checks
-5. Address any failures
-6. Merge when all checks pass
+1. **Workflow Permissions** (Settings → Actions → General):
+   - ✅ Read and write permissions
+   - ✅ Allow GitHub Actions to create and approve pull requests
 
-### Quality Standards
-- **Type Safety:** All code must pass TypeScript strict mode
-- **Linting:** Code must pass ESLint and Prettier checks
-- **Testing:** New features require tests
-- **Security:** Security-sensitive code requires security tests
-- **Coverage:** Aim for 80%+ code coverage
-- **Build:** All packages must build successfully
+2. **Branch Protection** (Settings → Branches → main):
+   - ✅ Require status checks to pass
+   - ✅ Require pull request reviews (recommended)
 
-### Debugging Failed Workflows
-1. Click on the failed workflow in the PR
-2. Expand the failed job
-3. Review the logs for error messages
-4. Download artifacts for detailed reports
-5. Run the same command locally to reproduce
-6. Fix the issue and push again
+## 🚨 Troubleshooting
 
-## Performance Optimization
+### Auto-Merge Not Working
 
-### Caching
-- Node modules are cached between runs using `cache: 'pnpm'`
-- Reduces install time from ~2min to ~30s
+**Problem**: PR with `automerge` label doesn't merge
 
-### Concurrency
-- Workflows cancel previous runs on new pushes (`cancel-in-progress: true`)
-- Prevents wasted CI minutes on outdated code
+**Check**:
+1. Are all status checks passing?
+2. Is the PR approved (if required)?
+3. Are workflow permissions enabled?
+4. Is the PR a draft?
 
-### Parallelization
-- Jobs run in parallel where possible
-- Quality gate waits for all jobs to complete
+**Solution**: Review PR checks and ensure all requirements are met
 
-### Timeouts
-- Each job has timeout limits to prevent hanging workflows
-- Adjust timeouts in workflow files if needed
+### Labels Not Auto-Applied
 
-## Monitoring
+**Problem**: Labels don't appear when PR is opened
 
-### GitHub Actions Dashboard
-- View workflow runs: `Actions` tab in repository
-- Filter by workflow, branch, or status
-- Download artifacts for test reports
+**Check**:
+1. Is the labeler workflow running? (Check Actions tab)
+2. Does `.github/labeler.yml` have matching patterns?
+3. Are the changed files matching the glob patterns?
 
-### Coverage Reports
-- View in GitHub Actions summary
-- Upload to Codecov for trend analysis
-- Review coverage changes in PRs
+**Solution**: Review workflow logs and labeler configuration
 
-### Quality Metrics
-- Track test pass rate over time
-- Monitor build times for performance
-- Review security test results
+## 📚 Related Documentation
 
-## Future Enhancements
+- **[Workspace README](../README.md)** - Workspace overview and structure
+- **[agentset-cloudflare-app Workflows](../agentset-cloudflare-app/.github/workflows/README.md)** - Comprehensive CI/CD documentation
+- **[Contributing Guide](../agentset-cloudflare-app/CONTRIBUTING.md)** - Development workflow
+- **[GitHub Actions Docs](https://docs.github.com/en/actions)** - Official GitHub Actions documentation
 
-### Planned Workflows (Task 16):
-1. **Worker Deployment** - Automated Cloudflare Worker deployment
-2. **Integration Tests** - Real Worker integration tests
-3. **Security Scans** - Dependency vulnerability scanning
-4. **Performance Tests** - Load testing on deployed Workers
+## 🤝 Contributing
 
-### Additional Configuration:
-1. **Branch Protection** - Require CI to pass before merge
-2. **CODEOWNERS** - Automatic reviewer assignment
-3. **Status Badges** - README badges for build status
-4. **Slack Notifications** - Alerts for CI failures
+To add new workflows or modify existing ones:
 
-## Troubleshooting
+1. Create or edit workflow files in `.github/workflows/`
+2. Test workflows using `workflow_dispatch` triggers
+3. Document changes in this README
+4. Submit PR with changes
 
-### Common Issues
+---
 
-#### Tests Not Running
-**Problem:** `No tests found` message in CI logs
-**Solution:** Add test scripts to package.json (see "Adding Test Scripts")
-
-#### Type Errors
-**Problem:** TypeScript errors in CI but not locally
-**Solution:** Ensure you've run `pnpm db:generate` locally
-
-#### Lint Failures
-**Problem:** ESLint/Prettier errors
-**Solution:** Run `pnpm lint:fix` and `pnpm format:fix` locally
-
-#### Build Failures
-**Problem:** Package fails to build in CI
-**Solution:** Run `pnpm build` locally to reproduce, check for missing dependencies
-
-#### Timeout Errors
-**Problem:** Workflow times out
-**Solution:** Increase timeout in workflow file or optimize tests
-
-## Support
-
-For CI/CD issues or questions:
-1. Check workflow logs for error details
-2. Review this README for common solutions
-3. Check `CONTRIBUTING.md` for development workflow
-4. Open an issue with CI logs attached
+**Last Updated**: October 28, 2025
+**Workspace**: AgentSet × Cloudflare Integration

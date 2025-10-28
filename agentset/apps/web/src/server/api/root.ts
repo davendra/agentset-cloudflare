@@ -1,7 +1,6 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 
 import { apiKeysRouter } from "./routers/api-keys";
-import { billingRouter } from "./routers/billing";
 import { cloudflareRouter } from "./routers/cloudflare";
 import { documentsRouter } from "./routers/documents";
 import { domainsRouter } from "./routers/domains";
@@ -18,7 +17,6 @@ export const appRouter = createTRPCRouter({
   ingestJob: ingestJobRouter,
   document: documentsRouter,
   upload: uploadsRouter,
-  billing: billingRouter,
   organization: organizationsRouter,
   hosting: hostingRouter,
   domain: domainsRouter,

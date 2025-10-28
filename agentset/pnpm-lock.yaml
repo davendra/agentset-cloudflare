@@ -81,6 +81,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@agentset/cloudflare-tools':
+        specifier: workspace:*
+        version: link:../../packages/cloudflare-tools
       '@agentset/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -387,6 +390,9 @@ importers:
 
   packages/engine:
     dependencies:
+      '@agentset/cloudflare-tools':
+        specifier: workspace:*
+        version: link:../cloudflare-tools
       '@agentset/db':
         specifier: workspace:*
         version: link:../db

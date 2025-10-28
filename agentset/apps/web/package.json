@@ -17,6 +17,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@agentset/cloudflare-tools": "workspace:*",
     "@agentset/db": "workspace:*",
     "@agentset/emails": "workspace:*",
     "@agentset/engine": "workspace:*",

@@ -17,6 +17,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@agentset/cloudflare-tools": "workspace:*",
     "@agentset/db": "workspace:*",
     "@agentset/storage": "workspace:*",
     "@agentset/utils": "workspace:*",

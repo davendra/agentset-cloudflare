@@ -2,8 +2,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod/v4";
 
-// TODO: Re-enable once @agentset/cloudflare-tools package is created
-// import { CloudflareSearchTool } from "@agentset/cloudflare-tools";
+import { CloudflareSearchTool } from "@agentset/cloudflare-tools";
 
 import { getNamespaceByUser } from "../auth";
 
@@ -155,38 +154,33 @@ export const cloudflareRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      // TODO: Re-enable once @agentset/cloudflare-tools package is created
-      throw new TRPCError({
-        code: "NOT_IMPLEMENTED",
-        message: "Cloudflare integration is temporarily disabled",
-      });
-      // try {
-      //   const client = new CloudflareSearchTool({
-      //     endpoint: input.endpoint,
-      //     apiKey: input.apiKey,
-      //   });
-      //
-      //   // Test with a simple query
-      //   const response = await client.search({
-      //     query: "test connection",
-      //     filters: { namespaceId: input.namespaceId },
-      //     mode: "private",
-      //     safety: "standard",
-      //     modelRoute: "fast-lane",
-      //     max_tokens: 10,
-      //   });
-      //
-      //   return {
-      //     success: true,
-      //     message: "Successfully connected to Cloudflare Worker",
-      //     latency: response.latency,
-      //   };
-      // } catch (error) {
-      //   throw new TRPCError({
-      //     code: "INTERNAL_SERVER_ERROR",
-      //     message: `Failed to connect to Cloudflare Worker: ${error instanceof Error ? error.message : "Unknown error"}`,
-      //   });
-      // }
+      try {
+        const client = new CloudflareSearchTool({
+          endpoint: input.endpoint,
+          apiKey: input.apiKey,
+        });
+
+        // Test with a simple query
+        const response = await client.search({
+          query: "test connection",
+          filters: { namespaceId: input.namespaceId },
+          mode: "private",
+          safety: "standard",
+          modelRoute: "fast-lane",
+          max_tokens: 10,
+        });
+
+        return {
+          success: true,
+          message: "Successfully connected to Cloudflare Worker",
+          latency: response.latency,
+        };
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to connect to Cloudflare Worker: ${error instanceof Error ? error.message : "Unknown error"}`,
+        });
+      }
     }),
 
   /**

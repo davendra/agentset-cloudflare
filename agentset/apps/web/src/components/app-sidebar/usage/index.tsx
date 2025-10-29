@@ -1,18 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { useCal } from "@/hooks/use-cal";
 import { useOrganization } from "@/hooks/use-organization";
 import { formatNumber } from "@/lib/utils";
 
-import { Button } from "@agentset/ui/button";
 import { Progress } from "@agentset/ui/progress";
 import { Skeleton } from "@agentset/ui/skeleton";
 import { INFINITY_NUMBER } from "@agentset/utils";
 
 export function Usage() {
   const activeOrganization = useOrganization();
-  const { buttonProps } = useCal();
 
   const formatUsage = (usage: number, limit: number) => {
     if (limit >= INFINITY_NUMBER) return "Unlimited";
@@ -90,12 +86,6 @@ export function Usage() {
               )}
             </div>
           </div>
-        </div>
-
-        <div className="mt-6 flex flex-col gap-2">
-          <Button variant="outline" className="w-full" {...buttonProps}>
-            Schedule a Demo
-          </Button>
         </div>
       </div>
     </div>

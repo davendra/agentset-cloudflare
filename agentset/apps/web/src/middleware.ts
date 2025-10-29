@@ -23,13 +23,15 @@ export const config = {
 
 export function middleware(request: NextRequest, event: NextFetchEvent) {
   try {
-    const { domain } = parse(request);
+    // Check if this is a Vercel deployment BEFORE parse() changes the domain
+    const originalHostname = request.nextUrl.hostname || request.headers.get("host") || "";
+    const isVercelDeployment = originalHostname.endsWith('.vercel.app');
 
-    // Check if this is a Vercel deployment (preview or production)
-    const isVercelDeployment = domain.endsWith('.vercel.app');
+    const { domain } = parse(request);
 
     // DEBUG: Log middleware routing
     console.log('[MIDDLEWARE DEBUG]', {
+      originalHostname,
       domain,
       path: request.nextUrl.pathname,
       isVercelDeployment,

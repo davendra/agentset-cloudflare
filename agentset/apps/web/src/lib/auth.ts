@@ -46,9 +46,12 @@ export const makeAuth = (params?: { baseUrl: string; isHosting: boolean }) => {
     },
     plugins: [
       admin(),
-      oAuthProxy({
-        productionURL: env.BETTER_AUTH_URL || "https://agentset-cloudflare.vercel.app",
-      }),
+      ...(process.env.NODE_ENV === 'development'
+        ? [oAuthProxy({
+            productionURL: env.BETTER_AUTH_URL || "https://agentset-cloudflare.vercel.app",
+          })]
+        : []
+      ),
       nextCookies(),
       organization({
         sendInvitationEmail: async ({ email, organization, id, inviter }) => {

@@ -117,6 +117,34 @@ export const POST = withPublicApiHandler(
         // Track usage
         incrementSearchUsage(hosting.namespace.id, 1);
 
+        // === SAVE CLOUDFLARE METRICS ===
+        // Track detailed metrics for dashboard and monitoring
+        try {
+          await db.cloudflareMetric.create({
+            data: {
+              namespaceId: hosting.namespace.id,
+              timestamp: new Date(),
+              queryCount: 1,
+              avgLatencyMs: latency,
+              p95LatencyMs: latency, // Single query, so p95 = actual
+              p99LatencyMs: latency, // Single query, so p99 = actual
+              cacheHits: response.metadata?.cached ? 1 : 0,
+              cacheMisses: response.metadata?.cached ? 0 : 1,
+              totalTokens: response.metadata?.tokens || null,
+              totalCost: null, // TODO: Calculate cost based on model and tokens
+              errorCount: 0,
+              rateLimitHits: 0,
+              // Store model usage breakdown
+              modelUsage: response.metadata?.model ? {
+                [response.metadata.model]: 1
+              } : null,
+            },
+          });
+        } catch (metricsError) {
+          // Don't fail the request if metrics logging fails
+          console.error("[HOSTING-SEARCH] Failed to log Cloudflare metrics:", metricsError);
+        }
+
         // Convert Cloudflare response to expected format
         // Cloudflare returns: { answer, sources[] }
         // UI expects: { totalQueries, queries[], chunks[] }
@@ -144,6 +172,23 @@ export const POST = withPublicApiHandler(
         });
       } catch (error) {
         console.error("[HOSTING-SEARCH] Cloudflare search failed, falling back to local RAG:", error);
+
+        // === TRACK ERROR METRICS ===
+        try {
+          await db.cloudflareMetric.create({
+            data: {
+              namespaceId: hosting.namespace.id,
+              timestamp: new Date(),
+              queryCount: 0,
+              errorCount: 1,
+              cacheHits: 0,
+              cacheMisses: 0,
+            },
+          });
+        } catch (metricsError) {
+          console.error("[HOSTING-SEARCH] Failed to log error metrics:", metricsError);
+        }
+
         // Fall through to local RAG below
       }
     }

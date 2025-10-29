@@ -13,9 +13,9 @@ const createPrismaClient = () => {
   // 2. Prisma Accelerate URLs (prisma:// or prisma+)
   // 3. Local PostgreSQL (@localhost or @127.0.0.1)
   // 4. No WebSocket (Node.js without polyfill)
-  // 5. Supabase direct connections (port 5432, not pooler)
+  // 5. Supabase connections (both direct :5432 and pooler :6543)
   // Prisma Accelerate doesn't support driver adapters
-  // Neon adapter requires WebSocket support - Supabase direct connections don't support this
+  // Supabase works with standard PrismaClient using pgbouncer pooling
   if (
     !connectionString ||
     typeof WebSocket === "undefined" ||
@@ -23,7 +23,7 @@ const createPrismaClient = () => {
     connectionString.includes("@127.0.0.1") ||
     connectionString.startsWith("prisma://") ||
     connectionString.startsWith("prisma+") ||
-    (connectionString.includes("supabase.co") && connectionString.includes(":5432"))
+    connectionString.includes("supabase.co")
   ) {
     return new PrismaClient({
       log:

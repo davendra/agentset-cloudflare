@@ -41,13 +41,13 @@ export const NamespaceSwitcher = () => {
   const [isPending, startTransition] = useTransition();
 
   const trpc = useTRPC();
-  const { data: namespaces, isLoading } = useQuery(
+  const { data: namespaces, isLoading, isFetching } = useQuery(
     trpc.namespace.getOrgNamespaces.queryOptions({
       slug: orgSlug,
     }),
   );
 
-  if (namespace.isLoading) {
+  if (namespace.isLoading || isLoading || isFetching || !namespaces) {
     return <NamespaceSwitcherSkeleton />;
   }
 
@@ -83,15 +83,19 @@ export const NamespaceSwitcher = () => {
           side="bottom"
           sideOffset={4}
         >
-          {namespaces?.map((namespace) => (
-            <DropdownMenuItem
-              className="gap-2 p-2"
-              key={namespace.id}
-              onClick={() => handleNamespaceChange(namespace)}
-            >
-              <p>{namespace.name}</p>
-            </DropdownMenuItem>
-          ))}
+          {namespaces && namespaces.length > 0 ? (
+            namespaces.map((namespace) => (
+              <DropdownMenuItem
+                className="gap-2 p-2"
+                key={namespace.id}
+                onClick={() => handleNamespaceChange(namespace)}
+              >
+                <p>{namespace.name}</p>
+              </DropdownMenuItem>
+            ))
+          ) : (
+            <DropdownMenuItem disabled>No namespaces found</DropdownMenuItem>
+          )}
 
           <DropdownMenuSeparator />
 

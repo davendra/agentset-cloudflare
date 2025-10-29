@@ -310,6 +310,9 @@ importers:
       '@prisma/client':
         specifier: ^6.16.2
         version: 6.16.2(prisma@6.16.2(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2)
+      prisma:
+        specifier: ^6.16.2
+        version: 6.16.2(magicast@0.3.5)(typescript@5.9.2)
     devDependencies:
       '@agentset/eslint-config':
         specifier: workspace:*
@@ -332,9 +335,6 @@ importers:
       prettier:
         specifier: 'catalog:'
         version: 3.6.2
-      prisma:
-        specifier: ^6.16.2
-        version: 6.16.2(magicast@0.3.5)(typescript@5.9.2)
       prisma-json-types-generator:
         specifier: ^3.6.1
         version: 3.6.1(@prisma/client@6.16.2(prisma@6.16.2(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(prisma@6.16.2(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2)

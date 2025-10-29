@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "pnpm with-env next build",
+    "vercel-build": "prisma generate && pnpm with-env next build",
     "clean": "git clean -xdf .cache .next .turbo node_modules",
     "check": "pnpm lint && tsc --noEmit",
     "dev": "pnpm with-env next dev",

@@ -2,7 +2,8 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { admin, magicLink, organization } from "better-auth/plugins";
+import { admin, magicLink, organization, oAuthProxy } from "better-auth/plugins";
+import { nextCookies } from "better-auth/next-js";
 
 import { db } from "@agentset/db";
 import { InviteUserEmail, LoginEmail, WelcomeEmail } from "@agentset/emails";
@@ -45,6 +46,10 @@ export const makeAuth = (params?: { baseUrl: string; isHosting: boolean }) => {
     },
     plugins: [
       admin(),
+      oAuthProxy({
+        productionURL: env.BETTER_AUTH_URL || "https://agentset-cloudflare.vercel.app",
+      }),
+      nextCookies(),
       organization({
         sendInvitationEmail: async ({ email, organization, id, inviter }) => {
           const url = `${getBaseUrl()}/invitation/${id}`;

@@ -28,7 +28,7 @@ model Organization {
 
   apiRatelimit Int @default(60) // requests per second
 
-  plan              String    @default("free")
+  plan              String    @default("pro")
   stripeId          String?   @unique // Stripe customer ID
   billingCycleStart Int? // day of the month when the billing cycle starts
   paymentFailedAt   DateTime?

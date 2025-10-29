@@ -7,7 +7,6 @@ import {
   GlobeIcon,
   HomeIcon,
   MessagesSquareIcon,
-  ReceiptIcon,
   RocketIcon,
   SearchIcon,
   SettingsIcon,
@@ -31,11 +30,6 @@ export const dashboardItems: SidebarItemType[] = [
     title: "Team",
     url: createOrgUrl("/team"),
     icon: UsersIcon,
-  },
-  {
-    title: "Billing",
-    url: createOrgUrl("/billing"),
-    icon: ReceiptIcon,
   },
   {
     title: "Settings",

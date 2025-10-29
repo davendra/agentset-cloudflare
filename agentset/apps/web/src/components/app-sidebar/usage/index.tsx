@@ -93,18 +93,6 @@ export function Usage() {
         </div>
 
         <div className="mt-6 flex flex-col gap-2">
-          {activeOrganization.isLoading ? (
-            <Skeleton className="h-9 w-full" />
-          ) : (
-            activeOrganization.plan === "free" && (
-              <Button asChild className="w-full">
-                <Link href={`/${activeOrganization.slug}/billing/upgrade`}>
-                  Get Pro
-                </Link>
-              </Button>
-            )
-          )}
-
           <Button variant="outline" className="w-full" {...buttonProps}>
             Schedule a Demo
           </Button>

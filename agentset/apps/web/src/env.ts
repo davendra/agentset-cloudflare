@@ -25,7 +25,8 @@ export const env = createEnv({
     RESEND_API_KEY: z.string(),
 
     BETTER_AUTH_SECRET: z.string(),
-    BETTER_AUTH_URL: z.url(),
+    // BETTER_AUTH_URL is optional because the auth route dynamically sets baseUrl from request host
+    BETTER_AUTH_URL: z.url().optional(),
 
     QSTASH_URL: z.url(),
     QSTASH_TOKEN: z.string(),

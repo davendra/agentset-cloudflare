@@ -13,7 +13,7 @@ import { sendEmail } from "./resend";
 import { getBaseUrl } from "./utils";
 
 export const makeAuth = (params?: { baseUrl: string; isHosting: boolean }) => {
-  const isUsingDefaultUrl = params?.baseUrl === env.BETTER_AUTH_URL;
+  const isUsingDefaultUrl = env.BETTER_AUTH_URL ? params?.baseUrl === env.BETTER_AUTH_URL : false;
 
   return betterAuth({
     appName: "Agentset",

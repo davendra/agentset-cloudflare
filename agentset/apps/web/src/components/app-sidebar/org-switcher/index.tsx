@@ -38,7 +38,7 @@ export function OrganizationSwitcher() {
   const activeOrganization = useOrganization();
 
   const trpc = useTRPC();
-  const { data: organizations } = useQuery(
+  const { data: organizations, isLoading: isLoadingOrgs, isFetching } = useQuery(
     trpc.organization.all.queryOptions(),
   );
 
@@ -70,7 +70,7 @@ export function OrganizationSwitcher() {
     await setActiveOrganization(organization);
   };
 
-  if (activeOrganization.isLoading) {
+  if (activeOrganization.isLoading || isLoadingOrgs || isFetching || !organizations) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
@@ -101,7 +101,7 @@ export function OrganizationSwitcher() {
                   {activeOrganization.name}
                 </span>
                 <span className="truncate text-xs">
-                  {activeOrganization.plan.toUpperCase()}
+                  {activeOrganization.plan?.toUpperCase() || 'PRO'}
                 </span>
               </div>
             </Link>
@@ -126,26 +126,32 @@ export function OrganizationSwitcher() {
               Organizations
             </DropdownMenuLabel>
 
-            {organizations?.map((organization) => (
-              <DropdownMenuItem
-                className="gap-2 p-2"
-                key={organization.id}
-                onClick={() => handleOrganizationChange(organization)}
-              >
-                <EntityAvatar
-                  entity={organization}
-                  className="border-border size-8 shrink-0 rounded-sm border"
-                  fallbackClassName="bg-transparent rounded-none text-foreground"
-                />
+            {organizations && organizations.length > 0 ? (
+              organizations.map((organization) => (
+                <DropdownMenuItem
+                  className="gap-2 p-2"
+                  key={organization.id}
+                  onClick={() => handleOrganizationChange(organization)}
+                >
+                  <EntityAvatar
+                    entity={organization}
+                    className="border-border size-8 shrink-0 rounded-sm border"
+                    fallbackClassName="bg-transparent rounded-none text-foreground"
+                  />
 
-                <div>
-                  <p>{organization.name}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {organization.plan.toUpperCase()}
-                  </p>
-                </div>
+                  <div>
+                    <p>{organization.name}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {organization.plan?.toUpperCase() || 'PRO'}
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+              ))
+            ) : (
+              <DropdownMenuItem disabled>
+                No organizations found
               </DropdownMenuItem>
-            ))}
+            )}
 
             <DropdownMenuSeparator />
 

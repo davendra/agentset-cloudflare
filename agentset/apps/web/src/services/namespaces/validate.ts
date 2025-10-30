@@ -30,27 +30,34 @@ export const validateVectorStoreConfig = async (
   vectorStoreConfig: NonNullable<Namespace["vectorStoreConfig"]>,
   embeddingConfig: NonNullable<Namespace["embeddingConfig"]>,
 ) => {
+  // Skip validation for managed providers - they handle dimensions automatically
+  // MANAGED_CLOUDFLARE: Cloudflare AI Search handles embeddings and dimensions
+  // MANAGED_TURBOPUFFER: Turbopuffer matches embedding dimensions automatically
+  if (
+    vectorStoreConfig.provider === "MANAGED_CLOUDFLARE" ||
+    vectorStoreConfig.provider === "MANAGED_TURBOPUFFER"
+  ) {
+    return {
+      success: true as const,
+    };
+  }
+
   // TODO: make this dynamic
   const embeddingDimensions: number = modelToDimensions[embeddingConfig.model];
 
-  // one of either vector store config or embedding config is provided
-  // TODO: make this dynamic
+  // Validate vector store and check dimensions
   let vectorStoreDimensions: number;
-  if (vectorStoreConfig.provider === "MANAGED_TURBOPUFFER") {
-    vectorStoreDimensions = embeddingDimensions;
-  } else {
-    try {
-      const v = await getNamespaceVectorStore({ id: "", vectorStoreConfig });
-      const dimensions = await v.getDimensions();
-      vectorStoreDimensions =
-        dimensions === "ANY" ? embeddingDimensions : dimensions;
-    } catch {
-      return {
-        success: false as const,
-        error:
-          "Failed to validate vector store config, make sure the API key is valid",
-      };
-    }
+  try {
+    const v = await getNamespaceVectorStore({ id: "", vectorStoreConfig });
+    const dimensions = await v.getDimensions();
+    vectorStoreDimensions =
+      dimensions === "ANY" ? embeddingDimensions : dimensions;
+  } catch {
+    return {
+      success: false as const,
+      error:
+        "Failed to validate vector store config, make sure the API key is valid",
+    };
   }
 
   if (vectorStoreDimensions !== embeddingDimensions) {
@@ -68,11 +75,14 @@ export const validateVectorStoreConfig = async (
 export const validateEmbeddingModel = async (
   embeddingConfig: NonNullable<Namespace["embeddingConfig"]>,
 ) => {
-  // if (embeddingConfig.provider.startsWith("MANAGED_")) {
-  //   return {
-  //     success: true as const,
-  //   };
-  // }
+  // Skip validation for managed providers - they don't require immediate API validation
+  // MANAGED_CLOUDFLARE: Embeddings are handled by Cloudflare AI Search Worker
+  // MANAGED_TURBOPUFFER: Embeddings are handled by Turbopuffer service
+  if (embeddingConfig.provider.startsWith("MANAGED_")) {
+    return {
+      success: true as const,
+    };
+  }
 
   const model = await getNamespaceEmbeddingModel({ embeddingConfig }, "query");
 

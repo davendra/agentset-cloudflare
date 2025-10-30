@@ -24,19 +24,18 @@ const modelToDimensions: Record<
   "voyage-code-3": 1024,
   "voyage-finance-2": 1024,
   "voyage-law-2": 1024,
+
+  // cloudflare (not used due to early return, but required for type completeness)
+  "auto": 768, // Cloudflare AI Search uses @cf/baai/bge-base-en-v1.5 which is 768 dimensions
 };
 
 export const validateVectorStoreConfig = async (
   vectorStoreConfig: NonNullable<Namespace["vectorStoreConfig"]>,
   embeddingConfig: NonNullable<Namespace["embeddingConfig"]>,
 ) => {
-  // Skip validation for managed providers - they handle dimensions automatically
-  // MANAGED_CLOUDFLARE: Cloudflare AI Search handles embeddings and dimensions
-  // MANAGED_TURBOPUFFER: Turbopuffer matches embedding dimensions automatically
-  if (
-    vectorStoreConfig.provider === "MANAGED_CLOUDFLARE" ||
-    vectorStoreConfig.provider === "MANAGED_TURBOPUFFER"
-  ) {
+  // Skip validation for MANAGED_CLOUDFLARE - it handles dimensions automatically
+  // Cloudflare AI Search handles embeddings and dimensions internally
+  if (vectorStoreConfig.provider === "MANAGED_CLOUDFLARE") {
     return {
       success: true as const,
     };

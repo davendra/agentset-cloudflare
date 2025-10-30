@@ -89,10 +89,13 @@ export const processDocument = schemaTask({
     });
 
     // Partition the document
+    if (!env.PARTITION_API_URL) {
+      throw new Error("PARTITION_API_URL is not configured");
+    }
     const response = await fetch(env.PARTITION_API_URL, {
       method: "POST",
       headers: {
-        "api-key": env.PARTITION_API_KEY,
+        "api-key": env.PARTITION_API_KEY ?? "",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(partitionBody),
@@ -249,7 +252,7 @@ export const processDocument = schemaTask({
       totalPages,
       totalTokens,
       totalChunks: result.total_chunks,
-      meterSuccess,
+      meterSuccess: true, // Document processing completed successfully
       pagesDelta: shouldCleanup ? delta : totalPages,
     };
   },
